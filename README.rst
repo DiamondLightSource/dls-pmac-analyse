@@ -14,12 +14,12 @@ Releases       https://github.com/dls-controls/dls_pmacanalyse/releases
 ============== ==============================================================
 
 
-.. |code_ci| image:: https://github.com/dls-controls/dls_pmacanalyse/workflows/Code%20CI/badge.svg?branch=main
-    :target: https://github.com/dls-controls/dls_pmacanalyse/actions?query=workflow%3A%22Code+CI%22
+.. |code_ci| image:: https://github.com/dls-controls/dls-pmac-analyse/workflows/Code%20CI/badge.svg?branch=main
+    :target: https://github.com/dls-controls/dls-pmac-analyse/actions?query=workflow%3A%22Code+CI%22
     :alt: Code CI
 
-.. |docs_ci| image:: https://github.com/dls-controls/dls_pmacanalyse/workflows/Docs%20CI/badge.svg?branch=main
-    :target: https://github.com/dls-controls/dls_pmacanalyse/actions?query=workflow%3A%22Docs+CI%22
+.. |docs_ci| image:: https://github.com/dls-controls/dls-pmac-analyse/workflows/Docs%20CI/badge.svg?branch=main
+    :target: https://github.com/dls-controls/dls-pmac-analyse/actions?query=workflow%3A%22Docs+CI%22
     :alt: Docs CI
 
 .. |coverage| image:: https://codecov.io/gh/dls-controls/dls_pmacanalyse/branch/main/graph/badge.svg
