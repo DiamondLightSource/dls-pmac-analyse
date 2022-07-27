@@ -14,7 +14,7 @@ sphinx-rtd-theme = "*"
 doc8 = "*"
 
 [packages]
-dls-pmaclib = "==2.1.0"
+dls-pmaclib = "==3.0.1"
 
 [scripts]
 # Put coverage here so we don't interfere with debugging in the IDE
