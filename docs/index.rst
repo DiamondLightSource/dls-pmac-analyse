@@ -1,14 +1,48 @@
-dls_pmacanalyse
-===========================
+.. include:: ../README.rst
+    :end-before: when included in index.rst
 
-A tool to compare the state of a pmac or geobrick with the motion area.
 
-Installation
-------------
+How the documentation is structured
+-----------------------------------
 
-pip install dls_pmacanalyse
+Documentation is split into four categories, also accessible from links in the
+side-bar.
 
-Usage
------
+.. rst-class:: columns
 
-dls_pmac_analyse.py --help
+`tutorials`
+~~~~~~~~~~~
+
+.. include:: tutorials.rst
+    :start-after: =========
+
+.. rst-class:: columns
+
+`how-to`
+~~~~~~~~
+
+.. include:: how-to.rst
+    :start-after: =============
+
+.. rst-class:: columns
+
+`explanations`
+~~~~~~~~~~~~~~
+
+.. include:: explanations.rst
+    :start-after: ============
+
+.. rst-class:: columns
+
+`reference`
+~~~~~~~~~~~
+
+.. include:: reference.rst
+    :start-after: =========
+
+.. rst-class:: endcolumns
+
+About the documentation
+~~~~~~~~~~~~~~~~~~~~~~~
+
+`Why is the documentation structured this way? <https://documentation.divio.com>`_
