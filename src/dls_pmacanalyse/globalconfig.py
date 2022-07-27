@@ -3,6 +3,7 @@ import logging
 import sys
 from typing import Dict
 
+from dls_pmacanalyse import __version__
 from dls_pmacanalyse.errors import ArgumentError, ConfigError
 from dls_pmacanalyse.pmac import Pmac
 from dls_pmacanalyse.pmacparser import PmacParser
@@ -71,6 +72,7 @@ class GlobalConfig(object):
                     "fixfile=",
                     "unfixfile=",
                     "loglevel=",
+                    "version",
                 ],
             )
         except getopt.GetoptError as err:
@@ -176,6 +178,9 @@ class GlobalConfig(object):
             elif o == "--loglevel":
                 numeric_level = getattr(logging, str(a).upper(), None)
                 log.setLevel(numeric_level)
+            elif o == "--version":
+                print(__version__)
+                exit(0)
         if len(args) > 1:
             raise ArgumentError("Too many arguments.")
         if len(args) == 1:

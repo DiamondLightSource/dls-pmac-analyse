@@ -47,6 +47,7 @@ helpText = """
         --unfixfile=<file>        Generate a file that can be used to correct the
                                   reference
         --loglevel=<level>        set logging to error warning info or debug
+        --version                 print(the version number and exit)
 
   Config file syntax:
     resultsdir <dir>
