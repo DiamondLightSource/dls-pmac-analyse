@@ -8,22 +8,22 @@ configuration matches its motion area definition.
 
 ============== ==============================================================
 PyPI           ``pip install dls_pmacanalyse``
-Source code    https://github.com/dls-controls/dls_pmacanalyse
-Documentation  https://dls-controls.github.io/dls_pmacanalyse
-Releases       https://github.com/dls-controls/dls_pmacanalyse/releases
+Source code    https://github.com/DiamondLightSource/dls_pmacanalyse
+Documentation  https://DiamondLightSource.github.io/dls_pmacanalyse
+Releases       https://github.com/DiamondLightSource/dls_pmacanalyse/releases
 ============== ==============================================================
 
 
-.. |code_ci| image:: https://github.com/dls-controls/dls-pmac-analyse/workflows/Code%20CI/badge.svg?branch=main
-    :target: https://github.com/dls-controls/dls-pmac-analyse/actions?query=workflow%3A%22Code+CI%22
+.. |code_ci| image:: https://github.com/DiamondLightSource/dls-pmac-analyse/workflows/Code%20CI/badge.svg?branch=main
+    :target: https://github.com/DiamondLightSource/dls-pmac-analyse/actions?query=workflow%3A%22Code+CI%22
     :alt: Code CI
 
-.. |docs_ci| image:: https://github.com/dls-controls/dls-pmac-analyse/workflows/Docs%20CI/badge.svg?branch=main
-    :target: https://github.com/dls-controls/dls-pmac-analyse/actions?query=workflow%3A%22Docs+CI%22
+.. |docs_ci| image:: https://github.com/DiamondLightSource/dls-pmac-analyse/workflows/Docs%20CI/badge.svg?branch=main
+    :target: https://github.com/DiamondLightSource/dls-pmac-analyse/actions?query=workflow%3A%22Docs+CI%22
     :alt: Docs CI
 
-.. |coverage| image:: https://codecov.io/gh/dls-controls/dls_pmacanalyse/branch/main/graph/badge.svg
-    :target: https://codecov.io/gh/dls-controls/dls_pmacanalyse
+.. |coverage| image:: https://codecov.io/gh/DiamondLightSource/dls_pmacanalyse/branch/main/graph/badge.svg
+    :target: https://codecov.io/gh/DiamondLightSource/dls_pmacanalyse
     :alt: Test Coverage
 
 .. |pypi_version| image:: https://img.shields.io/pypi/v/dls_pmacanalyse.svg
@@ -38,4 +38,4 @@ Releases       https://github.com/dls-controls/dls_pmacanalyse/releases
     Anything below this line is used when viewing README.rst and will be replaced
     when included in index.rst
 
-See https://dls-controls.github.io/dls_pmacanalyse for more detailed documentation.
+See https://DiamondLightSource.github.io/dls_pmacanalyse for more detailed documentation.
