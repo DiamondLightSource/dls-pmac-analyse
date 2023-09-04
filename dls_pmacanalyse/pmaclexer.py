@@ -173,6 +173,7 @@ class PmacLexer(object):
         "F",
         "FRAX",
         "G",
+        "GOS",
         "GOSUB",
         "GOTO",
         "IDIS",
