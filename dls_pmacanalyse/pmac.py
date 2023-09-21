@@ -509,8 +509,16 @@ class Pmac(object):
                 for index in range(0, len(more), 2):
                     offsets.append(more[index])
                     lines.append(more[index + 1])
-                # get rid of ending \r\x06
-                lines[-1] = lines[-1][:-2]
+                
+                if len(more) < 4:
+                    # get rid of ending \r\x06
+                    lines[-1] = lines[-1][:-2]
+                else:
+                    startPos = int(offsets[-1])
+                    # Chop off the last line (it may be incomplete) and adjust the start pos
+                    lines = lines[:-1]
+                    offsets = offsets[:-1]
+
         return (lines, offsets)
 
     def readPlcPrograms(self):
