@@ -4,7 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-flake8 = "==3.7.9"
+flake8 = "==7.0.0"
 pytest-cov = "*"
 pytest-black = "*"
 pytest-flake8 = "*"
