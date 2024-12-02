@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: dls-pmacanalyse
+  title: dls-pmacanalyse
+  description: analysis tool for validating pmac motion controller configuration
+spec:
+  type: library
+  lifecycle: production
+  owner: group:default/sscc
