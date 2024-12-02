@@ -47,7 +47,7 @@ class LexerError(Exception):
         self.line = line
 
     def __str__(self):
-        return "[%s:%s] Unknown token: %s" % (self.fileName, self.line, self.token)
+        return f"[{self.fileName}:{self.line}] Unknown token: {self.token}"
 
 
 class ParserError(Exception):
@@ -59,7 +59,7 @@ class ParserError(Exception):
         self.fileName = token.fileName
 
     def __str__(self):
-        return "[%s:%s] %s" % (self.fileName, self.line, self.message)
+        return f"[{self.fileName}:{self.line}] {self.message}"
 
 
 class GeneralError(Exception):

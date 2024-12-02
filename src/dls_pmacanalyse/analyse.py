@@ -43,8 +43,7 @@ class Analyse:
                 os.makedirs(self.config.resultsDir)
             elif not os.path.isdir(self.config.resultsDir):
                 raise ConfigError(
-                    "Results path exists but is not a directory: %s"
-                    % self.config.resultsDir
+                    f"Results path exists but is not a directory: {self.config.resultsDir}"
                 )
         # Make sure the backup directory exists if it is required
         if self.config.backupDir is not None:
@@ -52,12 +51,11 @@ class Analyse:
                 os.makedirs(self.config.backupDir)
             elif not os.path.isdir(self.config.backupDir):
                 raise ConfigError(
-                    "Backup path exists but is not a directory: %s"
-                    % self.config.backupDir
+                    f"Backup path exists but is not a directory: {self.config.backupDir}"
                 )
         if self.config.writeAnalysis is True:
             # Drop a style sheet
-            wFile = open("%s/analysis.css" % self.config.resultsDir, "w+")
+            wFile = open(f"{self.config.resultsDir}/analysis.css", "w+")
             wFile.write(
                 """
                 p{text-align:left; color:black; font-family:arial}
@@ -76,9 +74,10 @@ class Analyse:
             if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                 # Create the comparison web page
                 page = WebPage(
-                    "Comparison results for %s (%s)"
-                    % (pmac.name, datetime.today().strftime("%x %X")),
-                    "%s/%s_compare.htm" % (self.config.resultsDir, pmac.name),
+                    "Comparison results for {} ({})".format(
+                        pmac.name, datetime.today().strftime("%x %X")
+                    ),
+                    f"{self.config.resultsDir}/{pmac.name}_compare.htm",
                     styleSheet="analysis.css",
                 )
                 # Read the hardware (or compare with file)
@@ -121,82 +120,76 @@ class Analyse:
                 if matches:
                     # delete any existing comparison file
                     if os.path.exists(
-                        "%s/%s_compare.htm" % (self.config.resultsDir, pmac.name)
+                        f"{self.config.resultsDir}/{pmac.name}_compare.htm"
                     ):
-                        os.remove(
-                            "%s/%s_compare.htm" % (self.config.resultsDir, pmac.name)
-                        )
+                        os.remove(f"{self.config.resultsDir}/{pmac.name}_compare.htm")
                 else:
                     if self.config.writeAnalysis is True:
                         page.write()
         if self.config.writeAnalysis is True:
             # Create the top level page
             indexPage = WebPage(
-                "PMAC analysis (%s)" % datetime.today().strftime("%x %X"),
-                "%s/index.htm" % self.config.resultsDir,
+                "PMAC analysis ({})".format(datetime.today().strftime("%x %X")),
+                f"{self.config.resultsDir}/index.htm",
                 styleSheet="analysis.css",
             )
             table = indexPage.table(indexPage.body())
-            for name, pmac in self.config.pmacs.items():
+            for _, pmac in self.config.pmacs.items():
                 row = indexPage.tableRow(table)
-                indexPage.tableColumn(row, "%s" % pmac.name)
-                if os.path.exists(
-                    "%s/%s_compare.htm" % (self.config.resultsDir, pmac.name)
-                ):
+                indexPage.tableColumn(row, f"{pmac.name}")
+                if os.path.exists(f"{self.config.resultsDir}/{pmac.name}_compare.htm"):
                     indexPage.href(
                         indexPage.tableColumn(row),
-                        "%s_compare.htm" % pmac.name,
+                        f"{pmac.name}_compare.htm",
                         "Comparison results",
                     )
-                elif os.path.exists(
-                    "%s/%s_plcs.htm" % (self.config.resultsDir, pmac.name)
-                ):
+                elif os.path.exists(f"{self.config.resultsDir}/{pmac.name}_plcs.htm"):
                     indexPage.tableColumn(row, "Matches")
                 else:
                     indexPage.tableColumn(row, "No results")
                 indexPage.href(
                     indexPage.tableColumn(row),
-                    "%s_ivariables.htm" % pmac.name,
+                    f"{pmac.name}_ivariables.htm",
                     "I variables",
                 )
                 indexPage.href(
                     indexPage.tableColumn(row),
-                    "%s_pvariables.htm" % pmac.name,
+                    f"{pmac.name}_pvariables.htm",
                     "P variables",
                 )
                 indexPage.href(
                     indexPage.tableColumn(row),
-                    "%s_mvariables.htm" % pmac.name,
+                    f"{pmac.name}_mvariables.htm",
                     "M variables",
                 )
                 indexPage.href(
                     indexPage.tableColumn(row),
-                    "%s_mvariablevalues.htm" % pmac.name,
+                    f"{pmac.name}_mvariablevalues.htm",
                     "M variable values",
                 )
                 if pmac.numMacroStationIcs == 0:
                     indexPage.tableColumn(row, "-")
                 elif pmac.numMacroStationIcs is None and not os.path.exists(
-                    "%s/%s_msivariables.htm" % (self.config.resultsDir, pmac.name)
+                    f"{self.config.resultsDir}/{pmac.name}_msivariables.htm"
                 ):
                     indexPage.tableColumn(row, "-")
                 else:
                     indexPage.href(
                         indexPage.tableColumn(row),
-                        "%s_msivariables.htm" % pmac.name,
+                        f"{pmac.name}_msivariables.htm",
                         "MS variables",
                     )
                 indexPage.href(
                     indexPage.tableColumn(row),
-                    "%s_coordsystems.htm" % pmac.name,
+                    f"{pmac.name}_coordsystems.htm",
                     "Coordinate systems",
                 )
                 indexPage.href(
-                    indexPage.tableColumn(row), "%s_plcs.htm" % pmac.name, "PLCs"
+                    indexPage.tableColumn(row), f"{pmac.name}_plcs.htm", "PLCs"
                 )
                 indexPage.href(
                     indexPage.tableColumn(row),
-                    "%s_motionprogs.htm" % pmac.name,
+                    f"{pmac.name}_motionprogs.htm",
                     "Motion programs",
                 )
             indexPage.write()
@@ -205,29 +198,30 @@ class Analyse:
                 if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                     # Create the I variables top level web page
                     page = WebPage(
-                        "I Variables for %s (%s)"
-                        % (pmac.name, datetime.today().strftime("%x %X")),
-                        "%s/%s_ivariables.htm" % (self.config.resultsDir, pmac.name),
+                        "I Variables for {} ({})".format(
+                            pmac.name, datetime.today().strftime("%x %X")
+                        ),
+                        f"{self.config.resultsDir}/{pmac.name}_ivariables.htm",
                         styleSheet="analysis.css",
                     )
                     page.href(
                         page.body(),
-                        "%s_ivars_glob.htm" % pmac.name,
+                        f"{pmac.name}_ivars_glob.htm",
                         "Global I variables",
                     )
                     page.lineBreak(page.body())
                     for motor in range(1, pmac.numAxes + 1):
                         page.href(
                             page.body(),
-                            "%s_ivars_motor%s.htm" % (pmac.name, motor),
-                            "Motor %s I variables" % motor,
+                            f"{pmac.name}_ivars_motor{motor}.htm",
+                            f"Motor {motor} I variables",
                         )
                         page.lineBreak(page.body())
                     page.write()
                     # Create the global I variables page
                     page = WebPage(
-                        "Global I Variables for %s" % pmac.name,
-                        "%s/%s_ivars_glob.htm" % (self.config.resultsDir, pmac.name),
+                        f"Global I Variables for {pmac.name}",
+                        f"{self.config.resultsDir}/{pmac.name}_ivars_glob.htm",
                         styleSheet="analysis.css",
                     )
                     pmac.htmlGlobalIVariables(page)
@@ -235,9 +229,8 @@ class Analyse:
                     # Create each I variables page
                     for motor in range(1, pmac.numAxes + 1):
                         page = WebPage(
-                            "Motor %s I Variables for %s" % (motor, pmac.name),
-                            "%s/%s_ivars_motor%s.htm"
-                            % (self.config.resultsDir, pmac.name, motor),
+                            f"Motor {motor} I Variables for {pmac.name}",
+                            f"{self.config.resultsDir}/{pmac.name}_ivars_motor{motor}.htm",
                             styleSheet="analysis.css",
                         )
                         pmac.htmlMotorIVariables(motor, page)
@@ -248,31 +241,30 @@ class Analyse:
                     if pmac.numMacroStationIcs > 0:
                         # Create the MS,I variables top level web page
                         page = WebPage(
-                            "Macrostation I Variables for %s (%s)"
-                            % (pmac.name, datetime.today().strftime("%x %X")),
-                            "%s/%s_msivariables.htm"
-                            % (self.config.resultsDir, pmac.name),
+                            "Macrostation I Variables for {} ({})".format(
+                                pmac.name, datetime.today().strftime("%x %X")
+                            ),
+                            f"{self.config.resultsDir}/{pmac.name}_msivariables.htm",
                             styleSheet="analysis.css",
                         )
                         page.href(
                             page.body(),
-                            "%s_msivars_glob.htm" % pmac.name,
+                            f"{pmac.name}_msivars_glob.htm",
                             "Global macrostation I variables",
                         )
                         page.lineBreak(page.body())
                         for motor in range(1, pmac.numAxes + 1):
                             page.href(
                                 page.body(),
-                                "%s_msivars_motor%s.htm" % (pmac.name, motor),
-                                "Motor %s macrostation I variables" % motor,
+                                f"{pmac.name}_msivars_motor{motor}.htm",
+                                f"Motor {motor} macrostation I variables",
                             )
                             page.lineBreak(page.body())
                         page.write()
                         # Create the global macrostation I variables page
                         page = WebPage(
-                            "Global Macrostation I Variables for %s" % pmac.name,
-                            "%s/%s_msivars_glob.htm"
-                            % (self.config.resultsDir, pmac.name),
+                            f"Global Macrostation I Variables for {pmac.name}",
+                            f"{self.config.resultsDir}/{pmac.name}_msivars_glob.htm",
                             styleSheet="analysis.css",
                         )
                         pmac.htmlGlobalMsIVariables(page)
@@ -280,10 +272,8 @@ class Analyse:
                         # Create each motor macrostation I variables page
                         for motor in range(1, pmac.numAxes + 1):
                             page = WebPage(
-                                "Motor %s Macrostation I Variables for %s"
-                                % (motor, pmac.name),
-                                "%s/%s_msivars_motor%s.htm"
-                                % (self.config.resultsDir, pmac.name, motor),
+                                f"Motor {motor} Macrostation I Variables for {pmac.name}",
+                                f"{self.config.resultsDir}/{pmac.name}_msivars_motor{motor}.htm",
                                 styleSheet="analysis.css",
                             )
                             pmac.htmlMotorMsIVariables(motor, page)
@@ -292,9 +282,10 @@ class Analyse:
             for name, pmac in self.config.pmacs.items():
                 if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                     page = WebPage(
-                        "M Variables for %s (%s)"
-                        % (pmac.name, datetime.today().strftime("%x %X")),
-                        "%s/%s_mvariables.htm" % (self.config.resultsDir, pmac.name),
+                        "M Variables for {} ({})".format(
+                            pmac.name, datetime.today().strftime("%x %X")
+                        ),
+                        f"{self.config.resultsDir}/{pmac.name}_mvariables.htm",
                         styleSheet="analysis.css",
                     )
                     table = page.table(
@@ -305,20 +296,20 @@ class Analyse:
                     for m in range(8192):
                         if m % 10 == 0:
                             row = page.tableRow(table)
-                            page.tableColumn(row, "m%s->" % m)
+                            page.tableColumn(row, f"m{m}->")
                         var = pmac.hardwareState.getMVariable(m)
                         page.tableColumn(row, var.valStr())
-                    for i in range(8):
+                    for _i in range(8):
                         page.tableColumn(row, "")
                     page.write()
             # Dump the M variable values for each pmac
             for name, pmac in self.config.pmacs.items():
                 if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                     page = WebPage(
-                        "M Variable values for %s (%s)"
-                        % (pmac.name, datetime.today().strftime("%x %X")),
-                        "%s/%s_mvariablevalues.htm"
-                        % (self.config.resultsDir, pmac.name),
+                        "M Variable values for {} ({})".format(
+                            pmac.name, datetime.today().strftime("%x %X")
+                        ),
+                        f"{self.config.resultsDir}/{pmac.name}_mvariablevalues.htm",
                         styleSheet="analysis.css",
                     )
                     table = page.table(
@@ -329,19 +320,20 @@ class Analyse:
                     for m in range(8192):
                         if m % 10 == 0:
                             row = page.tableRow(table)
-                            page.tableColumn(row, "m%s" % m)
+                            page.tableColumn(row, f"m{m}")
                         mvar = cast(PmacMVariable, (pmac.hardwareState.getMVariable(m)))
                         page.tableColumn(row, mvar.contentsStr())
-                    for i in range(8):
+                    for _i in range(8):
                         page.tableColumn(row, "")
                     page.write()
             # Dump the P variables for each pmac
             for name, pmac in self.config.pmacs.items():
                 if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                     page = WebPage(
-                        "P Variables for %s (%s)"
-                        % (pmac.name, datetime.today().strftime("%x %X")),
-                        "%s/%s_pvariables.htm" % (self.config.resultsDir, pmac.name),
+                        "P Variables for {} ({})".format(
+                            pmac.name, datetime.today().strftime("%x %X")
+                        ),
+                        f"{self.config.resultsDir}/{pmac.name}_pvariables.htm",
                         styleSheet="analysis.css",
                     )
                     table = page.table(
@@ -352,10 +344,10 @@ class Analyse:
                     for m in range(8192):
                         if m % 10 == 0:
                             row = page.tableRow(table)
-                            page.tableColumn(row, "p%s" % m)
+                            page.tableColumn(row, f"p{m}")
                         var = pmac.hardwareState.getPVariable(m)
                         page.tableColumn(row, var.valStr())
-                    for i in range(8):
+                    for _i in range(8):
                         page.tableColumn(row, "")
                     page.write()
             # Dump the PLCs for each pmac
@@ -363,27 +355,28 @@ class Analyse:
                 if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                     # Create the PLC top level web page
                     page = WebPage(
-                        "PLCs for %s (%s)"
-                        % (pmac.name, datetime.today().strftime("%x %X")),
-                        "%s/%s_plcs.htm" % (self.config.resultsDir, pmac.name),
+                        "PLCs for {} ({})".format(
+                            pmac.name, datetime.today().strftime("%x %X")
+                        ),
+                        f"{self.config.resultsDir}/{pmac.name}_plcs.htm",
                         styleSheet="analysis.css",
                     )
                     table = page.table(page.body(), ["PLC", "Code", "P Variables"])
                     for id in range(32):
                         plc = pmac.hardwareState.getPlcProgramNoCreate(id)
                         row = page.tableRow(table)
-                        page.tableColumn(row, "%s" % id)
+                        page.tableColumn(row, f"{id}")
                         if plc is not None:
                             page.href(
                                 page.tableColumn(row),
-                                "%s_plc_%s.htm" % (pmac.name, id),
+                                f"{pmac.name}_plc_{id}.htm",
                                 "Code",
                             )
                         else:
                             page.tableColumn(row, "-")
                         page.href(
                             page.tableColumn(row),
-                            "%s_plc%s_p.htm" % (pmac.name, id),
+                            f"{pmac.name}_plc{id}_p.htm",
                             "P%d..%d" % (id * 100, id * 100 + 99),
                         )
                     page.write()
@@ -392,9 +385,8 @@ class Analyse:
                         plc = pmac.hardwareState.getPlcProgramNoCreate(id)
                         if plc is not None:
                             page = WebPage(
-                                "%s PLC%s" % (pmac.name, id),
-                                "%s/%s_plc_%s.htm"
-                                % (self.config.resultsDir, pmac.name, id),
+                                f"{pmac.name} PLC{id}",
+                                f"{self.config.resultsDir}/{pmac.name}_plc_{id}.htm",
                                 styleSheet="analysis.css",
                             )
                             plc.html2(page, page.body())
@@ -402,9 +394,8 @@ class Analyse:
                     # Create the P variable pages
                     for id in range(32):
                         page = WebPage(
-                            "P Variables for %s PLC %s" % (pmac.name, id),
-                            "%s/%s_plc%s_p.htm"
-                            % (self.config.resultsDir, pmac.name, id),
+                            f"P Variables for {pmac.name} PLC {id}",
+                            f"{self.config.resultsDir}/{pmac.name}_plc{id}_p.htm",
                             styleSheet="analysis.css",
                         )
                         table = page.table(
@@ -424,9 +415,10 @@ class Analyse:
                 if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                     # Create the motion program top level web page
                     page = WebPage(
-                        "Motion Programs for %s (%s)"
-                        % (pmac.name, datetime.today().strftime("%x %X")),
-                        "%s/%s_motionprogs.htm" % (self.config.resultsDir, pmac.name),
+                        "Motion Programs for {} ({})".format(
+                            pmac.name, datetime.today().strftime("%x %X")
+                        ),
+                        f"{self.config.resultsDir}/{pmac.name}_motionprogs.htm",
                         styleSheet="analysis.css",
                     )
                     table = page.table(page.body())
@@ -434,10 +426,10 @@ class Analyse:
                         prog = pmac.hardwareState.getMotionProgramNoCreate(id)
                         if prog is not None:
                             row = page.tableRow(table)
-                            page.tableColumn(row, "prog%s" % id)
+                            page.tableColumn(row, f"prog{id}")
                             page.href(
                                 page.tableColumn(row),
-                                "%s_prog_%s.htm" % (pmac.name, id),
+                                f"{pmac.name}_prog_{id}.htm",
                                 "Code",
                             )
                     page.write()
@@ -446,9 +438,8 @@ class Analyse:
                         prog = pmac.hardwareState.getMotionProgramNoCreate(id)
                         if prog is not None:
                             page = WebPage(
-                                "Motion Program %s for %s" % (id, pmac.name),
-                                "%s/%s_prog_%s.htm"
-                                % (self.config.resultsDir, pmac.name, id),
+                                f"Motion Program {id} for {pmac.name}",
+                                f"{self.config.resultsDir}/{pmac.name}_prog_{id}.htm",
                                 styleSheet="analysis.css",
                             )
                             prog.html2(page, page.body())
@@ -458,9 +449,10 @@ class Analyse:
                 if self.config.onlyPmacs is None or name in self.config.onlyPmacs:
                     # Create the coordinate systems top level web page
                     page = WebPage(
-                        "Coordinate Systems for %s (%s)"
-                        % (pmac.name, datetime.today().strftime("%x %X")),
-                        "%s/%s_coordsystems.htm" % (self.config.resultsDir, pmac.name),
+                        "Coordinate Systems for {} ({})".format(
+                            pmac.name, datetime.today().strftime("%x %X")
+                        ),
+                        f"{self.config.resultsDir}/{pmac.name}_coordsystems.htm",
                         styleSheet="analysis.css",
                     )
                     table = page.table(
@@ -476,12 +468,12 @@ class Analyse:
                     )
                     for id in range(1, 17):
                         row = page.tableRow(table)
-                        page.tableColumn(row, "%s" % id)
+                        page.tableColumn(row, f"{id}")
                         col = page.tableColumn(row)
                         for m in range(1, 33):
                             var = pmac.hardwareState.getCsAxisDefNoCreate(id, m)
                             if var is not None and not var.isZero():
-                                page.text(col, "#%s->" % m)
+                                page.text(col, f"#{m}->")
                                 var.html(page, col)
                         col = page.tableColumn(row)
                         var = pmac.hardwareState.getForwardKinematicProgramNoCreate(id)
@@ -493,7 +485,7 @@ class Analyse:
                             var.html(page, col)
                         page.href(
                             page.tableColumn(row),
-                            "%s_cs%s_q.htm" % (pmac.name, id),
+                            f"{pmac.name}_cs{id}_q.htm",
                             "Q Variables",
                         )
                         col = page.tableColumn(row)
@@ -503,9 +495,8 @@ class Analyse:
                     page.write()
                     for id in range(1, 17):
                         page = WebPage(
-                            "Q Variables for %s CS %s" % (pmac.name, id),
-                            "%s/%s_cs%s_q.htm"
-                            % (self.config.resultsDir, pmac.name, id),
+                            f"Q Variables for {pmac.name} CS {id}",
+                            f"{self.config.resultsDir}/{pmac.name}_cs{id}_q.htm",
                             styleSheet="analysis.css",
                         )
                         table = page.table(
@@ -516,7 +507,7 @@ class Analyse:
                         for m in range(100):
                             if m % 10 == 0:
                                 row = page.tableRow(table)
-                                page.tableColumn(row, "q%s" % m)
+                                page.tableColumn(row, f"q{m}")
                             var = pmac.hardwareState.getQVariable(id, m)
                             page.tableColumn(row, var.valStr())
                         page.write()
@@ -538,9 +529,7 @@ class Analyse:
 
     def hudsonXmlReport(self):
         # Write out an XML report for Hudson
-        xmlDoc = getDOMImplementation().createDocument(
-            None, "testsuite", None
-        )  # noqa
+        xmlDoc = getDOMImplementation().createDocument(None, "testsuite", None)  # noqa
         xmlTop = xmlDoc.documentElement
         xmlTop.setAttribute("tests", str(len(self.config.pmacs)))
         xmlTop.setAttribute("time", "0")
@@ -556,8 +545,8 @@ class Analyse:
                 element.appendChild(errorElement)
                 errorElement.setAttribute("message", "Compare mismatch")
                 textNode = xmlDoc.createTextNode(
-                    "See file:///%s/index.htm for details" % self.config.resultsDir
+                    f"See file:///{self.config.resultsDir}/index.htm for details"
                 )
                 errorElement.appendChild(textNode)
-        wFile = open("%s/report.xml" % self.config.resultsDir, "w")
+        wFile = open(f"{self.config.resultsDir}/report.xml", "w")
         xmlDoc.writexml(wFile, indent="", addindent="  ", newl="\n")

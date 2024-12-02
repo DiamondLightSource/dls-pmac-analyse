@@ -2,7 +2,7 @@ from dls_pmacanalyse.errors import LexerError, ParserError
 from dls_pmacanalyse.pmacvariables import PmacToken
 
 
-class PmacLexer(object):
+class PmacLexer:
     tokens = [
         "!",
         "@",
@@ -326,7 +326,7 @@ class PmacLexer(object):
                     t.set(self.expandToken(token), self.fileName, self.line)
                     # Replace token pairs with the single corresponding token
                     if lastToken is not None:
-                        pair = "%s %s" % (lastToken, t)
+                        pair = f"{lastToken} {t}"
                         if pair in self.tokenPairs:
                             self.tokens[-1].set(
                                 self.tokenPairs[pair], self.fileName, self.line
@@ -400,7 +400,7 @@ class PmacLexer(object):
                 if len(t) > len(bestToken) and text.startswith(t):
                     bestToken = t
             # Try the tokens in the short dictionary
-            for t, f in PmacLexer.shortTokens.items():
+            for t, _f in PmacLexer.shortTokens.items():
                 if len(t) > len(bestToken) and text.startswith(t):
                     bestToken = t
         if len(bestToken) == 0:
@@ -428,7 +428,7 @@ class PmacLexer(object):
             self.tokens[:1] = []
         # Is it the expected one
         if shouldBe is not None and not shouldBe == result:
-            raise ParserError("Expected %s, got %s" % (shouldBe, result), result)
+            raise ParserError(f"Expected {shouldBe}, got {result}", result)
         return result
 
     def putToken(self, token):

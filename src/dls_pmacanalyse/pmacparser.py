@@ -4,7 +4,7 @@ from dls_pmacanalyse.pmacvariables import PmacToken
 from dls_pmacanalyse.utils import tokenIsFloat, tokenIsInt, tokenToFloat, tokenToInt
 
 
-class PmacParser(object):
+class PmacParser:
     def __init__(self, source, pmac, debug=False):
         self.lexer = PmacLexer(source, debug)
         self.pmac = pmac
@@ -52,7 +52,7 @@ class PmacParser(object):
             elif t == "W":
                 self.parseWrite()
             else:
-                raise ParserError("Unexpected token: %s" % t, t)
+                raise ParserError(f"Unexpected token: {t}", t)
             t = self.lexer.getToken()
 
     def parseDisable(self):
@@ -62,9 +62,9 @@ class PmacParser(object):
             if tokenIsInt(t):
                 pass
             else:
-                raise ParserError("Expected integer, got %s" % t, self.lexer.line)
+                raise ParserError(f"Expected integer, got {t}", self.lexer.line)
         else:
-            raise ParserError("Expected PLC or PLCC, got %s" % t, self.lexer.line)
+            raise ParserError(f"Expected PLC or PLCC, got {t}", self.lexer.line)
 
     def parseWrite(self):
         _ = self.lexer.getToken()  # area
@@ -96,12 +96,12 @@ class PmacParser(object):
         ]:
             pass
         else:
-            raise ParserError("Expected DELETE type, got %s" % t, self.lexer.line)
+            raise ParserError(f"Expected DELETE type, got {t}", self.lexer.line)
 
     def parseEnable(self):
         t = self.lexer.getToken()
         if t not in ["PLC", "PLCC"]:
-            raise ParserError("Expected PLC or PLCC, got: %s" % t, self.lexer.line)
+            raise ParserError(f"Expected PLC or PLCC, got: {t}", self.lexer.line)
         _ = tokenToInt(self.lexer.getToken())
 
     def parseUndefine(self):
@@ -177,7 +177,7 @@ class PmacParser(object):
                 self.lexer.putToken(t)
                 # Report M variable values (do nothing)
         else:
-            raise ParserError("Unexpected statement: M %s" % n, n)
+            raise ParserError(f"Unexpected statement: M {n}", n)
 
     def parseMVariableAddress(self, start=0, count=0, increment=0, variable=None):
         type = self.lexer.getToken()
@@ -224,7 +224,7 @@ class PmacParser(object):
                 else:
                     self.lexer.putToken(t)
             if format not in ["U", "S"]:
-                raise ParserError("Expected format, got %s" % format, t)
+                raise ParserError(f"Expected format, got {format}", t)
         if variable is not None:
             variable.set(type, address, offset, width, format)
         else:
@@ -278,7 +278,7 @@ class PmacParser(object):
                 nodeList.append(tokenToInt(t))
             self.lexer.getToken("Q")
         else:
-            raise ParserError("Expected variable type, got: %s" % t, t)
+            raise ParserError(f"Expected variable type, got: {t}", t)
         start = tokenToInt(self.lexer.getToken())
         t = self.lexer.getToken()
         if t == "..":
@@ -324,7 +324,7 @@ class PmacParser(object):
                 self.lexer.putToken(t)
                 # Report I variable values (do nothing)
         else:
-            raise ParserError("Unexpected statement: I %s" % n, n)
+            raise ParserError(f"Unexpected statement: I {n}", n)
 
     def parseP(self):
         n = self.lexer.getToken()
@@ -462,7 +462,7 @@ class PmacParser(object):
 
     def parseE3(self):
         """Returns the result of a sub-expression that is an I,P,Q or M variable or
-           a constant or a parenthesised expression."""
+        a constant or a parenthesised expression."""
         t = self.lexer.getToken()
         if t == "(":
             result = self.parseExpression()
@@ -510,14 +510,14 @@ class PmacParser(object):
                 prog = self.pmac.getMotionProgram(tokenToInt(n))
                 self.parseProgram(prog)
             else:
-                raise ParserError("Expected integer, got: %s" % t, t)
+                raise ParserError(f"Expected integer, got: {t}", t)
         elif t == "PLC":
             n = self.lexer.getToken()
             if tokenIsInt(n):
                 prog = self.pmac.getPlcProgram(tokenToInt(n))
                 self.parseProgram(prog)
             else:
-                raise ParserError("Expected integer, got: %s" % t, t)
+                raise ParserError(f"Expected integer, got: {t}", t)
         elif t == "FORWARD":
             prog = self.pmac.getForwardKinematicProgram(self.curCs)
             self.parseProgram(prog)
@@ -525,7 +525,7 @@ class PmacParser(object):
             prog = self.pmac.getInverseKinematicProgram(self.curCs)
             self.parseProgram(prog)
         else:
-            raise ParserError("Unknown buffer type: %s" % t, t)
+            raise ParserError(f"Unknown buffer type: {t}", t)
 
     def parseProgram(self, prog):
         last = None
@@ -557,7 +557,7 @@ class PmacParser(object):
                     self.lexer.putToken(t)
                     self.lexer.getToken(")")
                     allTrue = True
-                    for x, t in axes.items():
+                    for _, t in axes.items():
                         if not t:
                             allTrue = False
                     if not allTrue:
@@ -667,7 +667,7 @@ class PmacParser(object):
             if t in ["X", "Y", "Z", "U", "V", "W", "A", "B", "C"]:
                 var.add(t)
             elif first:
-                raise ParserError("Expected axis definition, got: %s" % t, t)
+                raise ParserError(f"Expected axis definition, got: {t}", t)
             else:
                 self.lexer.putToken(t)
                 going = False

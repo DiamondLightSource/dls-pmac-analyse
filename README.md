@@ -12,4 +12,3 @@ Source          | <https://github.com/DiamondLightSource/dls-pmacanalyse>
 :---:           | :---:
 PyPI            | `pip install dls-pmacanalyse`
 Releases        | <https://github.com/DiamondLightSource/dls-pmacanalyse/releases>
-

@@ -25,7 +25,7 @@ from dls_pmacanalyse.pmacvariables import (
 log = logging.getLogger(__name__)
 
 
-class Pmac(object):
+class Pmac:
     """A class that represents a single PMAC and its state."""
 
     def __init__(self, name):
@@ -113,18 +113,18 @@ class Pmac(object):
 
     def readHardware(self, backupDir, checkPositions, debug, comments, verbose):
         """Loads the current state of the PMAC.  If a backupDir is provided, the
-           state is written as it is read."""
+        state is written as it is read."""
         self.checkPositions = checkPositions
         self.debug = debug
         self.comments = comments
         try:
             # Open the backup file if required
             if backupDir is not None:
-                fileName = "%s/%s.pmc" % (backupDir, self.name)
-                log.info("Opening backup file %s" % fileName)
+                fileName = f"{backupDir}/{self.name}.pmc"
+                log.info(f"Opening backup file {fileName}")
                 self.backupFile = open(fileName, "w")
                 if self.backupFile is None:
-                    raise AnalyseError("Could not open backup file: %s" % fileName)
+                    raise AnalyseError(f"Could not open backup file: {fileName}")
             # Open either a Telnet connection to a terminal server,
             # or a direct TCP/IP connection to a PMAC
             if self.termServ:
@@ -174,7 +174,7 @@ class Pmac(object):
                 self.backupFile = None
 
     def verifyCurrentPositions(self, positions):
-        """ Checks the axis current positions to see if any have moved."""
+        """Checks the axis current positions to see if any have moved."""
         if self.checkPositions:
             now = self.readCurrentPositions()
             match = True
@@ -191,8 +191,8 @@ class Pmac(object):
                 log.warning("No axes moved during hardware readout")
             else:
                 log.warning("One or more axes have moved:")
-                log.warning("  Before: %s" % positions)
-                log.warning("  Now:    %s" % now)
+                log.warning(f"  Before: {positions}")
+                log.warning(f"  Now:    {now}")
 
     def sendCommand(self, text):
         (returnStr, status) = self.pti.sendCommand(text)
@@ -200,7 +200,7 @@ class Pmac(object):
         return (returnStr, status)
 
     def readCurrentPositions(self):
-        """ Returns the current position as a list."""
+        """Returns the current position as a list."""
         positions = []
         for axis in range(self.numAxes):
             (returnStr, status) = self.sendCommand("#%sP" % (axis + 1))
@@ -220,11 +220,11 @@ class Pmac(object):
                 self.geobrick = True
             else:
                 self.geobrick = False
-            log.warning("Geobrick= %s" % self.geobrick)
+            log.warning(f"Geobrick= {self.geobrick}")
 
     def determineNumAxes(self):
         """Determines the number of axes the PMAC has by determining the
-           number of macro station ICs."""
+        number of macro station ICs."""
         if self.numMacroStationIcs is None:
             (returnStr, status) = self.sendCommand("i20 i21 i22 i23")
             if not status:
@@ -237,11 +237,11 @@ class Pmac(object):
         self.numAxes = self.numMacroStationIcs * 8
         if self.geobrick:
             self.numAxes += 8
-        log.info("Num axes= %s" % self.numAxes)
+        log.info(f"Num axes= {self.numAxes}")
 
     def determineNumCoordSystems(self):
         """Determines the number of coordinate systems that are active by
-           reading i68."""
+        reading i68."""
         (returnStr, status) = self.sendCommand("i68")
         if not status:
             raise PmacReadError(returnStr)
@@ -300,7 +300,7 @@ class Pmac(object):
             iend = i + varsPerBlock - 1
             if iend >= 8192:
                 iend = 8191
-            (returnStr, status) = self.sendCommand("i%s..%s" % (i, iend))
+            (returnStr, status) = self.sendCommand(f"i{i}..{iend}")
             if not status:
                 raise PmacReadError(returnStr)
             ivars = enumerate(returnStr.split("\r")[:-1])
@@ -347,7 +347,7 @@ class Pmac(object):
             iend = i + varsPerBlock - 1
             if iend >= 8192:
                 iend = 8191
-            (returnStr, status) = self.sendCommand("p%s..%s" % (i, iend))
+            (returnStr, status) = self.sendCommand(f"p{i}..{iend}")
             if not status:
                 raise PmacReadError(returnStr)
             pvars = enumerate(returnStr.split("\r")[:-1])
@@ -361,8 +361,8 @@ class Pmac(object):
         """Reads the Q variables of a coordinate system."""
         log.info("Reading Q-variables...")
         for cs in range(1, self.numCoordSystems + 1):
-            self.writeBackup("\n; &%s Q-variables\n" % cs)
-            (returnStr, status) = self.sendCommand("&%sq1..199" % cs)
+            self.writeBackup(f"\n; &{cs} Q-variables\n")
+            (returnStr, status) = self.sendCommand(f"&{cs}q1..199")
             if not status:
                 raise PmacReadError(returnStr)
             qvars = enumerate(returnStr.split("\r")[:-1])
@@ -376,7 +376,7 @@ class Pmac(object):
         log.info("Reading feedrate overrides...")
         self.writeBackup("\n; Feedrate overrides\n")
         for cs in range(1, self.numCoordSystems + 1):
-            (returnStr, status) = self.sendCommand("&%s%%" % cs)
+            (returnStr, status) = self.sendCommand(f"&{cs}%")
             if not status:
                 raise PmacReadError(returnStr)
             val = returnStr.split("\r")[0]
@@ -394,7 +394,7 @@ class Pmac(object):
             iend = i + varsPerBlock - 1
             if iend >= 8192:
                 iend = 8191
-            (returnStr, status) = self.sendCommand("m%s..%s->" % (i, iend))
+            (returnStr, status) = self.sendCommand(f"m{i}..{iend}->")
             if not status:
                 raise PmacReadError(returnStr)
             mvars = enumerate(returnStr.split("\r")[:-1])
@@ -415,7 +415,7 @@ class Pmac(object):
             iend = i + varsPerBlock - 1
             if iend >= 8192:
                 iend = 8191
-            (returnStr, status) = self.sendCommand("m%s..%s" % (i, iend))
+            (returnStr, status) = self.sendCommand(f"m{i}..{iend}")
             if not status:
                 raise PmacReadError(returnStr)
             mvars = enumerate(returnStr.split("\r")[:-1])
@@ -434,7 +434,7 @@ class Pmac(object):
         for cs in range(1, self.numCoordSystems + 1):
             for axis in range(1, 32 + 1):  # Note range is always 32 NOT self.numAxes
                 # Ask for the motor status in the coordinate system
-                cmd = "&%s#%s->" % (cs, axis)
+                cmd = f"&{cs}#{axis}->"
                 (returnStr, status) = self.sendCommand(cmd)
                 if not status or len(returnStr) <= 2:
                     raise PmacReadError(returnStr)
@@ -446,8 +446,8 @@ class Pmac(object):
 
     def readKinematicPrograms(self):
         """Reads the kinematic programs.  Note that this
-           function will fail if a program exceeds 1350 characters and small buffers
-           are required."""
+        function will fail if a program exceeds 1350 characters and small buffers
+        are required."""
         log.info("Reading kinematic programs...")
         self.writeBackup("\n; Kinematic programs\n")
         for cs in range(1, self.numCoordSystems + 1):
@@ -467,10 +467,10 @@ class Pmac(object):
 
     def getListingLines(self, thing, pre_thing=""):
         """Returns the listing of a motion program or PLC using
-           small blocks.  It uses the start and length parameters
-           of the list command to slowly build up the listing.  Note
-           that the function fails if any chuck exceeds 1350 characters.
-           For use in small buffer mode."""
+        small blocks.  It uses the start and length parameters
+        of the list command to slowly build up the listing.  Note
+        that the function fails if any chuck exceeds 1350 characters.
+        For use in small buffer mode."""
         lines = []
         offsets = []
         startPos = 0
@@ -509,7 +509,7 @@ class Pmac(object):
                 for index in range(0, len(more), 2):
                     offsets.append(more[index])
                     lines.append(more[index + 1])
-                
+
                 if len(more) < 4:
                     # get rid of ending \r\x06
                     lines[-1] = lines[-1][:-2]
@@ -526,7 +526,7 @@ class Pmac(object):
         log.info("Reading PLC programs...")
         self.writeBackup("\n; PLC programs\n")
         for plc in range(32):
-            (lines, offsets) = self.getListingLines("plc %s" % plc)
+            (lines, offsets) = self.getListingLines(f"plc {plc}")
             if len(lines) > 0:
                 parser = PmacParser(lines, self)
                 var = PmacPlcProgram(plc, parser.tokens(), lines, offsets)
@@ -535,11 +535,11 @@ class Pmac(object):
 
     def readMotionPrograms(self):
         """Reads the motion programs. Note
-           that only the first 256 programs are read, there are actually 32768."""
+        that only the first 256 programs are read, there are actually 32768."""
         log.info("Reading motion programs...")
         self.writeBackup("\n; Motion programs\n")
         for prog in range(1, 256):
-            (lines, offsets) = self.getListingLines("program %s" % prog)
+            (lines, offsets) = self.getListingLines(f"program {prog}")
             if len(lines) == 1 and lines[0].find("ERR003") >= 0:
                 lines = []
                 offsets = []
@@ -681,13 +681,13 @@ class Pmac(object):
     def doMsIvars(self, ms, reqVars, roVars):
         """Reads the specified set of global macrostation I variables."""
         for v in reqVars:
-            (returnStr, status) = self.sendCommand("ms%s,i%s" % (ms, v))
+            (returnStr, status) = self.sendCommand(f"ms{ms},i{v}")
             if status and returnStr[0] != "\x07":
                 var = PmacMsIVariable(ms, v, self.toNumber(returnStr[:-2]))
                 self.hardwareState.addVar(var)
                 self.writeBackup(var.dump())
         for v in roVars:
-            (returnStr, status) = self.sendCommand("ms%s,i%s" % (ms, v))
+            (returnStr, status) = self.sendCommand(f"ms{ms},i{v}")
             if status and returnStr[0] != "\x07":
                 var = PmacMsIVariable(ms, v, self.toNumber(returnStr[:-2]), ro=True)
                 self.hardwareState.addVar(var)

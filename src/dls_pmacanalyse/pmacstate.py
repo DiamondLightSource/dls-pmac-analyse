@@ -1,6 +1,6 @@
 from functools import cmp_to_key
 from logging import getLogger
-from typing import Dict, Type, Union, cast
+from typing import Union, cast
 
 from dls_pmaclib.dls_pmcpreprocessor import ClsPmacParser
 
@@ -28,22 +28,20 @@ from .utils import numericSort
 log = getLogger(__name__)
 
 PmacVariableResult = Union[None, PmacVariable]
-Vars1Param = Type[
-    Union[
-        PmacMotionProgram,
-        PmacPlcProgram,
-        PmacForwardKinematicProgram,
-        PmacInverseKinematicProgram,
-        PmacPVariable,
-        PmacIVariable,
-        PmacMVariable,
-    ]
+Vars1Param = type[
+    PmacMotionProgram
+    | PmacPlcProgram
+    | PmacForwardKinematicProgram
+    | PmacInverseKinematicProgram
+    | PmacPVariable
+    | PmacIVariable
+    | PmacMVariable
 ]
 
 Vars2Param = Union[PmacQVariable, PmacMsIVariable, PmacCsAxisDef, PmacFeedrateOverride]
 
 
-class PmacState(object):
+class PmacState:
     """Represents the internal state of a PMAC."""
 
     globalIVariableDescriptions = {
@@ -589,21 +587,19 @@ class PmacState(object):
     }
 
     def __init__(self, descr):
-        self.vars: Dict[
+        self.vars: dict[
             str,
-            Union[
-                PmacMotionProgram,
-                PmacPlcProgram,
-                PmacForwardKinematicProgram,
-                PmacInverseKinematicProgram,
-                PmacPVariable,
-                PmacIVariable,
-                PmacMVariable,
-                PmacQVariable,
-                PmacMsIVariable,
-                PmacCsAxisDef,
-                PmacFeedrateOverride,
-            ],
+            PmacMotionProgram
+            | PmacPlcProgram
+            | PmacForwardKinematicProgram
+            | PmacInverseKinematicProgram
+            | PmacPVariable
+            | PmacIVariable
+            | PmacMVariable
+            | PmacQVariable
+            | PmacMsIVariable
+            | PmacCsAxisDef
+            | PmacFeedrateOverride,
         ] = {}
         self.descr = descr
         self.inlineExpressionResolutionState = None
@@ -635,7 +631,7 @@ class PmacState(object):
             self.vars[k] = v.copyFrom()
 
     def getVar(self, t: str, n: int) -> PmacVariable:
-        addr = "%s%s" % (t, n)
+        addr = f"{t}{n}"
         if addr in self.vars:
             result = self.vars[addr]
         else:
@@ -654,12 +650,12 @@ class PmacState(object):
             elif t == "m":
                 result = PmacMVariable(n)
             else:
-                raise GeneralError("Illegal program type: %s" % t)
+                raise GeneralError(f"Illegal program type: {t}")
             self.vars[addr] = result
         return result
 
     def getVar2(self, t1: str, n1: int, t2: str, n2: int) -> PmacVariable:
-        addr = "%s%s%s%s" % (t1, n1, t2, n2)
+        addr = f"{t1}{n1}{t2}{n2}"
         if addr in self.vars:
             result = self.vars[addr]
         else:
@@ -672,19 +668,19 @@ class PmacState(object):
             elif t2 == "%":
                 result = PmacFeedrateOverride(n1)
             else:
-                raise GeneralError("Illegal program type: %sx%s" % (t1, t2))
+                raise GeneralError(f"Illegal program type: {t1}x{t2}")
             self.vars[addr] = result
         return result
 
     def getVarNoCreate(self, t: str, n: int) -> PmacVariableResult:
-        addr = "%s%s" % (t, n)
+        addr = f"{t}{n}"
         result = None
         if addr in self.vars:
             result = self.vars[addr]
         return result
 
     def getVarNoCreate2(self, t1: str, n1: int, t2: str, n2: int) -> PmacVariableResult:
-        addr = "%s%s%s%s" % (t1, n1, t2, n2)
+        addr = f"{t1}{n1}{t2}{n2}"
         result = None
         if addr in self.vars:
             result = self.vars[addr]
@@ -743,7 +739,7 @@ class PmacState(object):
 
     def dump(self):
         result = ""
-        for a, v in self.vars.items():
+        for _a, v in self.vars.items():
             result += v.dump()
         return result
 
@@ -753,9 +749,9 @@ class PmacState(object):
             page.tableRow(
                 table,
                 [
-                    "i%s" % i,
-                    "%s" % self.getIVariable(i).valStr(),
-                    "%s" % PmacState.globalIVariableDescriptions[i],
+                    f"i{i}",
+                    f"{self.getIVariable(i).valStr()}",
+                    f"{PmacState.globalIVariableDescriptions[i]}",
                 ],
             )
 
@@ -766,9 +762,9 @@ class PmacState(object):
             page.tableRow(
                 table,
                 [
-                    "i%s" % i,
-                    "%s" % self.getIVariable(i).valStr(),
-                    "%s" % PmacState.motorIVariableDescriptions[n],
+                    f"i{i}",
+                    f"{self.getIVariable(i).valStr()}",
+                    f"{PmacState.motorIVariableDescriptions[n]}",
                 ],
             )
         if geobrick:
@@ -777,9 +773,9 @@ class PmacState(object):
                 page.tableRow(
                     table,
                     [
-                        "i%s" % i,
-                        "%s" % self.getIVariable(i).valStr(),
-                        "%s" % PmacState.motorI7000VariableDescriptions[n],
+                        f"i{i}",
+                        f"{self.getIVariable(i).valStr()}",
+                        f"{PmacState.motorI7000VariableDescriptions[n]}",
                     ],
                 )
 
@@ -792,10 +788,10 @@ class PmacState(object):
                 page.tableRow(
                     table,
                     [
-                        "i%s" % i,
-                        "%s" % node,
-                        "%s" % self.getMsIVariable(0, i).valStr(),
-                        "%s" % description,
+                        f"i{i}",
+                        f"{node}",
+                        f"{self.getMsIVariable(0, i).valStr()}",
+                        f"{description}",
                     ],
                 )
 
@@ -806,9 +802,9 @@ class PmacState(object):
             page.tableRow(
                 table,
                 [
-                    "i%s" % i,
-                    "%s" % self.getMsIVariable(node, i).valStr(),
-                    "%s" % description,
+                    f"i{i}",
+                    f"{self.getMsIVariable(node, i).valStr()}",
+                    f"{description}",
                 ],
             )
 
@@ -879,20 +875,18 @@ class PmacState(object):
                 )
                 if plc.shouldBeRunning and not plc.isRunning:
                     result = False
-                    self.writeHtmlRow(
-                        page, table, "plc%s" % n, "Not running", None, None
-                    )
+                    self.writeHtmlRow(page, table, f"plc{n}", "Not running", None, None)
                     if fixfile is not None:
-                        fixfile.write("enable plc %s\n" % n)
+                        fixfile.write(f"enable plc {n}\n")
                     if unfixfile is not None:
-                        unfixfile.write("disable plc %s\n" % n)
+                        unfixfile.write(f"disable plc {n}\n")
                 elif not plc.shouldBeRunning and plc.isRunning:
                     result = False
-                    self.writeHtmlRow(page, table, "plc%s" % n, "Running", None, None)
+                    self.writeHtmlRow(page, table, f"plc{n}", "Running", None, None)
                     if fixfile is not None:
-                        fixfile.write("disable plc %s\n" % n)
+                        fixfile.write(f"disable plc {n}\n")
                     if unfixfile is not None:
-                        unfixfile.write("enable plc %s\n" % n)
+                        unfixfile.write(f"enable plc {n}\n")
         return result
 
     def writeHtmlRow(self, page, parent, addr, reason, referenceVar, hardwareVar):
@@ -916,9 +910,9 @@ class PmacState(object):
 
     def loadPmcFile(self, fileName):
         """Loads a PMC file into this PMAC state."""
-        file = open(fileName, "r")
+        file = open(fileName)
         if file is None:
-            raise AnalyseError("Could not open reference file: %s" % fileName)
+            raise AnalyseError(f"Could not open reference file: {fileName}")
         log.info("Loading PMC file %s...", fileName)
         parser = PmacParser(file, self)
         parser.onLine()
@@ -934,6 +928,6 @@ class PmacState(object):
         log.info("Loading PMC file %s...", fileName)
         converted = p.parse(fileName, debug=True)
         if converted is None:
-            raise AnalyseError("Could not open reference file: %s" % fileName)
+            raise AnalyseError(f"Could not open reference file: {fileName}")
         parser = PmacParser(p.output, self)
         parser.onLine()

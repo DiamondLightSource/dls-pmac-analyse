@@ -62,7 +62,7 @@ def tokenIsInt(token):
 
 def tokenToInt(token):
     if not tokenIsInt(token):
-        raise ParserError("Integer expected, got: %s" % token, token)
+        raise ParserError(f"Integer expected, got: {token}", token)
     if str(token)[0] == "$":
         result = int(str(token)[1:], 16)
     else:
@@ -87,14 +87,14 @@ def tokenToFloat(token):
     elif tokenIsFloat(token):
         result = float(str(token))
     else:
-        raise ParserError("Float expected, got: %s" % token, token)
+        raise ParserError(f"Float expected, got: {token}", token)
     return result
 
 
 def numericSplit(a):
     """Splits a into two parts, a numeric suffix (or 0 if none) and an
-       alphanumeric prefix (the remainder).  The parts are returned
-       as a tuple."""
+    alphanumeric prefix (the remainder).  The parts are returned
+    as a tuple."""
     splitPos = len(a)
     inSuffix = True
     while splitPos > 0 and inSuffix:

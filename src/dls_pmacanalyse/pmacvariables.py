@@ -2,7 +2,7 @@ from dls_pmacanalyse.errors import GeneralError
 from dls_pmacanalyse.utils import tokenIsFloat, tokenToFloat
 
 
-class PmacToken(object):
+class PmacToken:
     def __init__(self, text=None):
         self.fileName = ""
         self.line = ""
@@ -33,11 +33,11 @@ class PmacToken(object):
         return self.text.lower()
 
 
-class PmacVariable(object):
+class PmacVariable:
     spaces = "                        "
 
     def __init__(self, prefix, n, v):
-        self.typeStr = "%s%s" % (prefix, n)
+        self.typeStr = f"{prefix}{n}"
         self.n = n
         self.v = v
         self.ro = False
@@ -60,11 +60,11 @@ class PmacVariable(object):
 
     def valStr(self):
         if isinstance(self.v, float):
-            result = ("%.12f" % self.v).rstrip("0")
+            result = (f"{self.v:.12f}").rstrip("0")
             if result.endswith("."):
                 result += "0"
         else:
-            result = "%s" % self.v
+            result = f"{self.v}"
         return result
 
     def getFloatValue(self):
@@ -94,17 +94,17 @@ class PmacIVariable(PmacVariable):
     def dump(self, typ=0, comment=""):
         result = ""
         if typ == 1:
-            result = "%s" % self.valStr()
+            result = f"{self.valStr()}"
         else:
             if self.ro:
                 result += ";"
-            result += "i%s=%s" % (self.n, self.valStr())
+            result += f"i{self.n}={self.valStr()}"
             if len(comment) == 0:
                 result += "\n"
             else:
                 if len(result) < len(self.spaces):
                     result += self.spaces[len(result) :]
-                result += ";%s\n" % comment
+                result += f";{comment}\n"
         return result
 
     def copyFrom(self):
@@ -115,7 +115,7 @@ class PmacIVariable(PmacVariable):
 
     def valStr(self):
         if isinstance(self.v, float):
-            result = ("%.12f" % self.v).rstrip("0")
+            result = (f"{self.v:.12f}").rstrip("0")
             if result.endswith("."):
                 result += "0"
         else:
@@ -125,9 +125,9 @@ class PmacIVariable(PmacVariable):
             else:
                 useHex = self.n in self.useHexGlobal
             if useHex:
-                result = "$%x" % self.v
+                result = f"${self.v:x}"
             else:
-                result = "%s" % self.v
+                result = f"{self.v}"
         return result
 
 
@@ -138,9 +138,9 @@ class PmacMVariable(PmacVariable):
 
     def dump(self, typ=0):
         if typ == 1:
-            result = "%s" % self.valStr()
+            result = f"{self.valStr()}"
         else:
-            result = "m%s->%s\n" % (self.n, self.valStr())
+            result = f"m{self.n}->{self.valStr()}\n"
         return result
 
     def valStr(self):
@@ -148,21 +148,21 @@ class PmacMVariable(PmacVariable):
         if self.type == "*":
             result += "*"
         elif self.type in ["X", "Y"]:
-            result += "%s:$%x" % (self.type, self.address)
+            result += f"{self.type}:${self.address:x}"
             if self.width == 24:
                 result += ",24"
                 if not self.format == "U":
-                    result += ",%s" % self.format
+                    result += f",{self.format}"
             else:
-                result += ",%s" % self.offset
+                result += f",{self.offset}"
                 if not self.width == 1 or not self.format == "U":
-                    result += ",%s" % self.width
+                    result += f",{self.width}"
                     if not self.format == "U":
-                        result += ",%s" % self.format
+                        result += f",{self.format}"
         elif self.type in ["D", "DP", "F", "L"]:
-            result += "%s:$%x" % (self.type, self.address)
+            result += f"{self.type}:${self.address:x}"
         elif self.type in ["TWS", "TWR", "TWD", "TWB"]:
-            result += "%s:$%x" % (self.type, self.address)
+            result += f"{self.type}:${self.address:x}"
         else:
             raise GeneralError("Unsupported")
         return result
@@ -210,9 +210,9 @@ class PmacPVariable(PmacVariable):
 
     def dump(self, typ=0):
         if typ == 1:
-            result = "%s" % self.valStr()
+            result = f"{self.valStr()}"
         else:
-            result = "p%s=%s\n" % (self.n, self.valStr())
+            result = f"p{self.n}={self.valStr()}\n"
         return result
 
     def copyFrom(self):
@@ -224,14 +224,14 @@ class PmacPVariable(PmacVariable):
 
 class PmacQVariable(PmacVariable):
     def __init__(self, cs, n, v=0):
-        PmacVariable.__init__(self, "&%sq" % cs, n, v)
+        PmacVariable.__init__(self, f"&{cs}q", n, v)
         self.cs = cs
 
     def dump(self, typ=0):
         if typ == 1:
-            result = "%s" % self.valStr()
+            result = f"{self.valStr()}"
         else:
-            result = "&%sq%s=%s\n" % (self.cs, self.n, self.valStr())
+            result = f"&{self.cs}q{self.n}={self.valStr()}\n"
         return result
 
     def copyFrom(self):
@@ -243,14 +243,14 @@ class PmacQVariable(PmacVariable):
 
 class PmacFeedrateOverride(PmacVariable):
     def __init__(self, cs, v=0):
-        PmacVariable.__init__(self, "&%s%%" % cs, 0, v)
+        PmacVariable.__init__(self, f"&{cs}%", 0, v)
         self.cs = cs
 
     def dump(self, typ=0):
         if typ == 1:
-            result = "%s" % self.valStr()
+            result = f"{self.valStr()}"
         else:
-            result = "&%s%%%s\n" % (self.cs, self.valStr())
+            result = f"&{self.cs}%{self.valStr()}\n"
         return result
 
     def copyFrom(self):
@@ -262,18 +262,18 @@ class PmacFeedrateOverride(PmacVariable):
 
 class PmacMsIVariable(PmacVariable):
     def __init__(self, ms, n, v="", ro=False):
-        PmacVariable.__init__(self, "ms%si" % ms, n, v)
+        PmacVariable.__init__(self, f"ms{ms}i", n, v)
         self.ms = ms
         self.ro = ro
 
     def dump(self, typ=0):
         if typ == 1:
-            result = "%s" % self.valStr()
+            result = f"{self.valStr()}"
         else:
             result = ""
             if self.ro:
                 result += ";"
-            result += "ms%s,i%s=%s\n" % (self.ms, self.n, self.valStr())
+            result += f"ms{self.ms},i{self.n}={self.valStr()}\n"
         return result
 
     def copyFrom(self):

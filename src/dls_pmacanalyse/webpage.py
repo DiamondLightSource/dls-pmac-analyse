@@ -1,7 +1,7 @@
 from xml.dom.minidom import getDOMImplementation
 
 
-class WebPage(object):
+class WebPage:
     def __init__(self, title, fileName, styleSheet=None):
         """Initialises a web page, creating all the necessary header stuff"""
         self.fileName = fileName

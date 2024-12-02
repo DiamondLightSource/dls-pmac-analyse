@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List
 
 from dls_pmacanalyse.pmacparser import PmacParser
 from dls_pmacanalyse.pmacvariables import PmacToken, PmacVariable
@@ -19,11 +18,11 @@ class PmacProgram(PmacVariable):
     def __init__(self, prefix, n, v, lines=None, offsets=None):
         PmacVariable.__init__(self, prefix, n, v)
         self.offsets = offsets
-        self.lines: List[str] = lines or []
+        self.lines: list[str] = lines or []
 
     def add(self, t):
         if not isinstance(t, PmacToken):
-            log.warning("PmacProgram: %s is not a token" % repr(t))
+            log.warning(f"PmacProgram: {repr(t)} is not a token")
         self.v.append(t)
 
     def clear(self):
@@ -122,7 +121,7 @@ class PmacProgram(PmacVariable):
     def html2(self, page, parent):
         text = ""
         for i in range(len(self.lines)):
-            text += "%s:\t%s\n" % (self.offsets[i], self.lines[i])
+            text += f"{self.offsets[i]}:\t{self.lines[i]}\n"
         page.paragraph(parent, text, id="code")
 
     def isEmpty(self):
@@ -153,7 +152,9 @@ class PmacProgram(PmacVariable):
 
 
 class PmacPlcProgram(PmacProgram):
-    def __init__(self, n, v=[], lines=None, offsets=None):
+    def __init__(self, n, v=None, lines=None, offsets=None):
+        if v is None:
+            v = []
         PmacProgram.__init__(self, "plc", n, v, lines, offsets)
         self.isRunning = False
         self.shouldBeRunning = False
@@ -164,7 +165,7 @@ class PmacPlcProgram(PmacProgram):
         else:
             result = ""
             if len(self.v) > 0:
-                result = "\nopen plc %s clear\n" % self.n
+                result = f"\nopen plc {self.n} clear\n"
                 result += self.valueText(ignore_ret=True)
                 result += "close\n"
         return result
@@ -208,15 +209,17 @@ class PmacCommandString(PmacProgram):
 
 
 class PmacCsAxisDef(PmacProgram):
-    def __init__(self, cs, n, v=[PmacToken("0")]):
-        PmacProgram.__init__(self, "&%s#" % cs, n, v)
+    def __init__(self, cs, n, v=None):
+        if v is None:
+            v = [PmacToken("0")]
+        PmacProgram.__init__(self, f"&{cs}#", n, v)
         self.cs = cs
 
     def dump(self, typ=0):
         if typ == 1:
-            result = "%s" % self.valueText()
+            result = f"{self.valueText()}"
         else:
-            result = "&%s#%s->%s" % (self.cs, self.n, self.valueText())
+            result = f"&{self.cs}#{self.n}->{self.valueText()}"
         return result
 
     def isZero(self):
@@ -238,7 +241,9 @@ class PmacCsAxisDef(PmacProgram):
 
 
 class PmacForwardKinematicProgram(PmacProgram):
-    def __init__(self, n, v=[]):
+    def __init__(self, n, v=None):
+        if v is None:
+            v = []
         PmacProgram.__init__(self, "fwd", n, v)
 
     def dump(self, typ=0):
@@ -247,7 +252,7 @@ class PmacForwardKinematicProgram(PmacProgram):
         else:
             result = ""
             if len(self.v) > 0:
-                result = "\n&%s open forward clear\n" % self.n
+                result = f"\n&{self.n} open forward clear\n"
                 result += self.valueText(ignore_ret=True)
                 result += "close\n"
         return result
@@ -262,7 +267,9 @@ class PmacForwardKinematicProgram(PmacProgram):
 
 
 class PmacInverseKinematicProgram(PmacProgram):
-    def __init__(self, n, v=[]):
+    def __init__(self, n, v=None):
+        if v is None:
+            v = []
         PmacProgram.__init__(self, "inv", n, v)
 
     def dump(self, typ=0):
@@ -271,7 +278,7 @@ class PmacInverseKinematicProgram(PmacProgram):
         else:
             result = ""
             if len(self.v) > 0:
-                result = "\n&%s open inverse clear\n" % self.n
+                result = f"\n&{self.n} open inverse clear\n"
                 result += self.valueText(ignore_ret=True)
                 result += "close\n"
         return result
@@ -286,7 +293,9 @@ class PmacInverseKinematicProgram(PmacProgram):
 
 
 class PmacMotionProgram(PmacProgram):
-    def __init__(self, n, v=[], lines=None, offsets=None):
+    def __init__(self, n, v=None, lines=None, offsets=None):
+        if v is None:
+            v = []
         PmacProgram.__init__(self, "prog", n, v, lines, offsets)
 
     def dump(self, typ=0):
@@ -295,7 +304,7 @@ class PmacMotionProgram(PmacProgram):
         else:
             result = ""
             if len(self.v) > 0:
-                result = "\nopen program %s clear\n" % self.n
+                result = f"\nopen program {self.n} clear\n"
                 result += self.valueText(ignore_ret=True)
                 result += "close\n"
         return result
