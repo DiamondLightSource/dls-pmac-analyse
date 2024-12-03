@@ -10,7 +10,8 @@ from ._version import __version__
 
 # handy in ipython maybe ?
 # from .errors import ConfigError
-# from .globalconfig import GlobalConfig
+from .globalconfig import GlobalConfig  # type: ignore # noqa: F401
+
 # from .pmac import Pmac
 # from .webpage import WebPage
 

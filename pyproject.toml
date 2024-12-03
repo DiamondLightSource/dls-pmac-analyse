@@ -58,8 +58,10 @@ ignore_missing_imports = true # Ignore missing stubs in imported modules
 addopts = """
     --tb=native -vv
     """
-# https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
-filterwarnings = "error"
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+] # telnet is deprecated, but we still use it
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
 
@@ -78,7 +80,6 @@ legacy_tox_ini = """
 skipsdist=True
 
 [testenv:{pre-commit,type-checking,tests}]
-# Don't create a virtualenv for the command, requires tox-direct plugin
 direct = True
 passenv = *
 allowlist_externals =
@@ -87,10 +88,12 @@ allowlist_externals =
     mypy
 commands =
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
-    type-checking: mypy src tests {posargs}
-    tests: pytest --cov=dls_pmacanalyse --cov-report term --cov-report xml:cov.xml {posargs}
+type-checking: mypy src tests {posargs}
+tests: pytest --cov=dls_pmacanalyse --cov-report term --cov-report xml:cov.xml {posargs}
 """
 
+# https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
+# Don't create a virtualenv for the command, requires tox-direct plugin
 [tool.ruff]
 src = ["src", "tests"]
 line-length = 88
