@@ -377,7 +377,7 @@ class Analyse:
                         page.href(
                             page.tableColumn(row),
                             f"{pmac.name}_plc{id}_p.htm",
-                            "P%d..%d" % (id * 100, id * 100 + 99),
+                            f"P{id * 100}..{id * 100 + 99}",
                         )
                     page.write()
                     # Create the listing pages
